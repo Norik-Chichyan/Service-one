@@ -1,0 +1,65 @@
+---
+- name: 'consul installing with playbook'
+  hosts: 127.0.0.1
+# tasks file for consul install
+  tasks:
+
+    - name: Add rabbit repo
+      shell: echo "deb https://packages.erlang-solutions.com/ubuntu focal contrib" | sudo tee /etc/apt/sources.list.d/rabbitmq.list
+      become: yes
+
+      #    - name: add trusted key
+      #shell: wget -O- https://dl.bintray.com/rabbitmq/Keys/rabbitmq-release-signing-key.asc | sudo apt-key add -
+      #become: yes
+    
+    - name: add trusted key
+      shell: wget -O- https://www.rabbitmq.com/rabbitmq-release-signing-key.asc | sudo apt-key add -
+      become: yes
+
+    - name: Add repo
+      shell: echo "deb https://dl.bintray.com/rabbitmq-erlang/debian focal erlang-22.x" | sudo tee /etc/apt/sources.list.d/rabbitmq.list
+
+    - name: Install nessesary package1
+      apt:
+        name: apt-transport-https
+        state: present
+        #update_cache: yes
+      become: yes
+    - name: Install nessesary package2
+      apt:
+        name: erlang
+        state: present
+        #update_cache: yes
+      become: yes
+
+    - name: install rabbitmq
+      apt:
+        name: rabbitmq-server
+        state: present
+        # update_cache: yes
+      become: yes
+
+    - name: enable rabbitmq plugins
+      rabbitmq_plugin:
+        names: rabbitmq_management
+        state: enabled
+      become: yes
+   #   notify:
+   #    - restart rabbitmq
+   #  become: yes
+    - name: add rabbitmq users admin
+      rabbitmq_user:
+        user: rabbitmq
+        password: Aa123456
+        vhost: /
+        tags: administrator
+        configure_priv: .*
+        read_priv: .*
+        write_priv: .*
+        state: present
+      become: yes  
+
+    - name: restart rabbitmq
+      service: name=rabbitmq-server state=restarted
+      become: yes
+...
