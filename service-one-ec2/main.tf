@@ -20,7 +20,12 @@ data "aws_ami" "ubuntu" {
 }
 resource "aws_instance" "service_one" {
   ami = data.aws_ami.ubuntu.id
-  instance_type = "t2.micro"
-  key_name = "aws-key2"
+  instance_type = var.instance_type
+  key_name = var.key_name
 
   }
+
+resource "null_resource" "ansible-run" {
+ provisioner "local-exec" {
+    command = "ansible-playbook -i inventory consul.yml"
+ }

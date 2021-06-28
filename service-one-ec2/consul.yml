@@ -1,0 +1,58 @@
+---
+# tasks file for mysql
+    - name: 'Installing unzip wget'
+      apt:
+        name:
+           - unzip
+           - wget
+           - curl
+           - gnupg2
+        state: present
+        update_cache: yes
+      become: yes
+    - name: download and unarchive consul
+      become: yes
+      unarchive:
+              src: 'https://releases.hashicorp.com/consul/1.8.4/consul_1.8.4_linux_amd64.zip'
+              dest: /usr/local/bin/
+              remote_src: yes
+    - name: creat data_dir
+      file:
+        path: /var/lib/consul
+        state: directory
+    
+    - name: creat conf_dir
+      file:
+        path: /etc/consul.d
+        state: directory
+      become: yes
+    - name: 'Setup consul config'
+      template:
+              src: 'consul-config'
+              dest: '/etc/consul.d/config.json'
+      become: yes
+
+    - name: 'Setup consul service file'
+      template:
+              src: 'consul.service'
+              dest: '/etc/systemd/system/consul.service'
+      become: yes
+    - name: Change the working directory to somedir/ and run the command as db_owner if /path/to/database does not exist.
+      command: /usr/bin/make_database.sh db_user db_name
+      become: yes
+
+    - name: consul.service
+      ansible.builtin.service:
+        name: consul.service
+        enabled: yes
+      become: yes
+    
+    - name: consul.service
+      ansible.builtin.service:
+        name: consul.service
+        state: started
+      become: yes
+    
+    - name: reboot the machine
+      reboot:
+      become: yes
