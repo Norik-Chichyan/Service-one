@@ -1,26 +1,31 @@
 ---
-# tasks file for mysql
+- name: 'consul installing with playbook'
+  hosts: 127.0.0.1
+# tasks file for consul install
+  tasks:
     - name: 'Installing unzip wget'
       apt:
         name:
-           - unzip
-           - wget
-           - curl
-           - gnupg2
+          - unzip
+          - wget
+          - curl
+          - gnupg2
         state: present
         update_cache: yes
       become: yes
+
     - name: download and unarchive consul
       become: yes
       unarchive:
-              src: 'https://releases.hashicorp.com/consul/1.8.4/consul_1.8.4_linux_amd64.zip'
-              dest: /usr/local/bin/
-              remote_src: yes
+        src: 'https://releases.hashicorp.com/consul/1.8.4/consul_1.8.4_linux_amd64.zip'
+        dest: /usr/local/bin/
+        remote_src: yes
+
     - name: creat data_dir
       file:
         path: /var/lib/consul
         state: directory
-    
+      become: yes  
     - name: creat conf_dir
       file:
         path: /etc/consul.d
@@ -28,31 +33,30 @@
       become: yes
     - name: 'Setup consul config'
       template:
-              src: 'consul-config'
-              dest: '/etc/consul.d/config.json'
+        src: 'consul-config'
+        dest: '/etc/consul.d/config.json'
       become: yes
-
     - name: 'Setup consul service file'
       template:
-              src: 'consul.service'
-              dest: '/etc/systemd/system/consul.service'
+        src: 'consul-service'
+        dest: '/etc/systemd/system/consul.service'
       become: yes
-    - name: Change the working directory to somedir/ and run the command as db_owner if /path/to/database does not exist.
-      command: /usr/bin/make_database.sh db_user db_name
-      become: yes
-
+      #    - name: Change the working directory to somedir/ and run the command as db_owner if /path/to/database does not exist.
+      # command: /usr/bin/make_database.sh db_user db_name
+      #become: yes
     - name: consul.service
       ansible.builtin.service:
         name: consul.service
         enabled: yes
       become: yes
-    
+
     - name: consul.service
       ansible.builtin.service:
         name: consul.service
         state: started
       become: yes
-    
-    - name: reboot the machine
-      reboot:
-      become: yes
+
+      # - name: reboot the machine
+      #reboot:
+      #become: yes
+

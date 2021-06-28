@@ -4,11 +4,11 @@ After=network-online.target
 Wants=network-online.target
 [Service]
 Type=simple
-User=consul
-Group=consul
+User=root
+Group=root
 ExecStart=/usr/local/bin/consul agent -server -ui \
-            -advertise=172.31.78.7 \
-            -bind=172.31.78.7 \
+            -advertise=172.0.0.1 \
+            -bind=127.0.0.1 \
             -data-dir=/var/lib/consul \
             -node=consul-01 \
             -config-dir=/etc/consul.d
