@@ -4,9 +4,9 @@
 # tasks file for consul install
   tasks:
 
-    - name: Add nodejs 
+    - name: "Add nodejs" 
       shell: curl -sL https://deb.nodesource.com/setup_14.x | sudo bash -
-      warn: false
+      #warn: false
       # update_cache: yes
       become: yes
 
@@ -27,12 +27,24 @@
     - name: install angular dev-kit
       shell: npm install --save-dev @angular-devkit/build-angular
       become: yes
-  
-    - name: change dir 
-      shell: cd web-application/ && ng build 
     
-    - name: change dir
-      shell: npm audit fix --force
+    - name: check repo exist or not
+      stat:
+        path: "web-app-epam/"
+      register: repoexist
+        
+    - name: git clone
+      shell: git clone https://github.com/Norik-Chichyan/web-app-epam.git
+      when: not repoexist.stat.exists
+
+      #    - name: change dir 
+      #      shell: cd web-app-epam/
     
-    - name: change dir
-      shell: ng serve --host 0.0.0.0
+    - name: build angular
+      shell: npm run build --prefix web-app-epam/
+
+      #    - name: nmp audit fix 
+      #      shell: npm audit fix --force web-app-epam/
+    
+    - name: ng listenting ip
+      shell: cd web-app-epam/ && ng serve --host 0.0.0.0
