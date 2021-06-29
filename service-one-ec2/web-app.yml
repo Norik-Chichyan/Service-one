@@ -1,0 +1,38 @@
+---
+- name: 'web-app installing with playbook'
+  hosts: 127.0.0.1
+# tasks file for consul install
+  tasks:
+
+    - name: Add nodejs 
+      shell: curl -sL https://deb.nodesource.com/setup_14.x | sudo bash -
+      warn: false
+      # update_cache: yes
+      become: yes
+
+      #    - name: add trusted key
+      #shell: wget -O- https://dl.bintray.com/rabbitmq/Keys/rabbitmq-release-signing-key.asc | sudo apt-key add -
+      #become: yes
+    - name: 'Installing nodejs'
+      apt:
+        name: nodejs
+        state: present
+        update_cache: yes
+      become: yes
+    
+    - name: install angular
+      shell: npm install -g @angular/cli
+      become: yes
+    
+    - name: install angular dev-kit
+      shell: npm install --save-dev @angular-devkit/build-angular
+      become: yes
+  
+    - name: change dir 
+      shell: cd web-application/ && ng build 
+    
+    - name: change dir
+      shell: npm audit fix --force
+    
+    - name: change dir
+      shell: ng serve --host 0.0.0.0
